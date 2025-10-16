@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Create Company - Truck Stop{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">🏢 Create New Company</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('companies.create') }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Company Name *</label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                       placeholder="Enter company name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="industry" class="form-label">Industry *</label>
+                                <select class="form-select" id="industry" name="industry" required>
+                                    <option value="">Select Industry</option>
+                                    <option value="Technology">Technology</option>
+                                    <option value="Logistics">Logistics</option>
+                                    <option value="Transportation">Transportation</option>
+                                    <option value="Food Delivery">Food Delivery</option>
+                                    <option value="Manufacturing">Manufacturing</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="employees" class="form-label">Number of Employees</label>
+                                <input type="number" class="form-control" id="employees" name="employees"
+                                       placeholder="Enter employee count">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Location</label>
+                                <input type="text" class="form-control" id="location" name="location"
+                                       placeholder="City, State">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description"
+                                  rows="4" placeholder="Describe the company..."></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('companies.index') }}" class="btn btn-secondary me-md-2">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">Create Company</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

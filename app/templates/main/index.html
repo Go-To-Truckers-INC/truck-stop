@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Go To Truckers - Revolutionizing Trucking Management{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <!-- Logo -->
+                <div class="mb-4">
+                    <img src="{{ url_for('static', filename='images/GTT_Blanco.png') }}"
+                         alt="Go To Truckers"
+                         height="80"
+                         class="d-inline-block"
+                         onerror="this.style.display='none';">
+                </div>
+                <h2 class="fw-bold mb-3">Advanced Trucking Analytics & Management</h2>
+                <p class="lead mb-4">
+                    The comprehensive platform for modern trucking companies.
+                    Track credit scores, payment performance, and company data
+                    with our powerful analytics dashboard.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    {% if not session.user_authenticated %}
+                        <a href="{{ url_for('auth.signin') }}" class="btn btn-light btn-lg">
+                            🔐 Sign In
+                        </a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-lg">
+                            📝 Register
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-light btn-lg">
+                            📊 View Dashboard
+                        </a>
+                        <a href="{{ url_for('companies.index') }}" class="btn btn-outline-light btn-lg">
+                            🏢 Manage Companies
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="hero-image mt-4 mt-lg-0">
+                    <div class="bg-white rounded-3 p-4 shadow-lg">
+                        <h4 class="text-dark mb-3">Platform Analytics</h4>
+                        <div class="platform-stats">
+                            <div class="row text-center">
+                                <div class="col-6 mb-3">
+                                    <div class="text-primary fw-bold display-6">📊</div>
+                                    <small class="text-muted">Credit Score Tracking</small>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="text-success fw-bold display-6">💰</div>
+                                    <small class="text-muted">Payment Analytics</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-info fw-bold display-6">🏢</div>
+                                    <small class="text-muted">Company Database</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-warning fw-bold display-6">📈</div>
+                                    <small class="text-muted">Performance Reports</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Overview -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3">Comprehensive Trucking Intelligence</h2>
+                <p class="lead text-muted">
+                    Everything you need to make informed decisions about trucking companies
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm text-center">
+                    <div class="card-body p-4">
+                        <div class="feature-icon mb-3">
+                            <span style="font-size: 3rem;">📊</span>
+                        </div>
+                        <h5>Credit Analytics</h5>
+                        <p class="text-muted">
+                            Track credit scores and financial health of trucking companies with real-time data.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm text-center">
+                    <div class="card-body p-4">
+                        <div class="feature-icon mb-3">
+                            <span style="font-size: 3rem;">💰</span>
+                        </div>
+                        <h5>Payment Performance</h5>
+                        <p class="text-muted">
+                            Monitor average days to pay and identify reliable business partners.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm text-center">
+                    <div class="card-body p-4">
+                        <div class="feature-icon mb-3">
+                            <span style="font-size: 3rem;">🏢</span>
+                        </div>
+                        <h5>Company Database</h5>
+                        <p class="text-muted">
+                            Access comprehensive company profiles with Hubspot integration and regional data.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Data Metrics -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <h3 class="display-4 fw-bold text-primary">500+</h3>
+                <p class="text-muted">Trucking Companies</p>
+            </div>
+            <div class="col-md-3">
+                <h3 class="display-4 fw-bold text-success">85%</h3>
+                <p class="text-muted">Avg Credit Score</p>
+            </div>
+            <div class="col-md-3">
+                <h3 class="display-4 fw-bold text-info">35</h3>
+                <p class="text-muted">Avg Days to Pay</p>
+            </div>
+            <div class="col-md-3">
+                <h3 class="display-4 fw-bold text-warning">12</h3>
+                <p class="text-muted">Avg Companies Reporting</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="fw-bold mb-3">Ready to Make Smarter Business Decisions?</h3>
+                <p class="mb-0">
+                    Join industry leaders using Go To Truckers to analyze credit scores, payment performance, and company reliability.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                {% if not session.user_authenticated %}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                        Start Your Free Trial
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary btn-lg">
+                        View Analytics Dashboard
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border-radius: 0 0 2rem 2rem;
+    margin: 0 -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.feature-icon {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .feature-icon {
+    transform: scale(1.1);
+}
+
+.platform-stats {
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    border-radius: 1rem;
+    padding: 1.5rem;
+}
+</style>
+{% endblock %}
