@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, session
 from app.components.navigation import NavigationManager
 
 # Crear blueprint principal
-main_bp = Blueprint('main', __name__)
+main_bp = Blueprint('main', __name__, static_folder='static', template_folder='templates')
 nav_manager = NavigationManager()
 
 
