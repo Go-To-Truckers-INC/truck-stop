@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from flask_talisman import Talisman
 
 # Cargar variables de entorno AL INICIO
 load_dotenv()
@@ -38,6 +39,16 @@ def create_app():
 
     # 2. Crear servidor
     server = FlaskServer('truck_stop_app')
+
+    csp = {
+        "default-src": ["'self'"],
+        "style-src": ["'self'", "https://cdn.jsdelivr.net", "'nonce-{{ g.nonce }}'"],
+        "script-src": ["'self'", "https://cdn.jsdelivr.net", "'nonce-{{ g.nonce }}'"]
+    }
+
+    # Inicializa Talisman
+    talisman = Talisman(server.app, content_security_policy=csp,
+                        content_security_policy_nonce_in=['style-src', 'script-src'])
 
     # 3. Configuración
     config = {
