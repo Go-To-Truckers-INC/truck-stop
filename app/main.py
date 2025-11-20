@@ -22,24 +22,25 @@ def setup_sdks():
     sdk_manager = SDKManager()
 
     try:
+        pass
         # Configuración explícita de Firebase SDK
-        firebase_sdk = FirebaseSDK()
-
-        # Intentar inicializar Firebase
-        firebase_initialized = firebase_sdk.initialize()
-
-        if firebase_initialized:
-            print("✅ Firebase SDK inicializado correctamente")
-        else:
-            error_msg = firebase_sdk.get_error() or "Error desconocido"
-            print(f"⚠️  Firebase SDK no se pudo inicializar: {error_msg}")
-            print("⚠️  La aplicación continuará sin funcionalidades de Firebase")
-
-        # Registrar el SDK independientemente del resultado
-        registration_success = sdk_manager.register_sdk('firebase', firebase_sdk)
-
-        if not registration_success:
-            print("❌ Error registrando Firebase SDK en el manager")
+        # firebase_sdk = FirebaseSDK()
+        #
+        # # Intentar inicializar Firebase
+        # firebase_initialized = firebase_sdk.initialize()
+        #
+        # if firebase_initialized:
+        #     print("✅ Firebase SDK inicializado correctamente")
+        # else:
+        #     error_msg = firebase_sdk.get_error() or "Error desconocido"
+        #     print(f"⚠️  Firebase SDK no se pudo inicializar: {error_msg}")
+        #     print("⚠️  La aplicación continuará sin funcionalidades de Firebase")
+        #
+        # # Registrar el SDK independientemente del resultado
+        # registration_success = sdk_manager.register_sdk('firebase', firebase_sdk)
+        #
+        # if not registration_success:
+        #     print("❌ Error registrando Firebase SDK en el manager")
 
     except Exception as e:
         print(f"❌ Error inesperado configurando SDKs: {e}")
