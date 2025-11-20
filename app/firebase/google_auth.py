@@ -18,7 +18,7 @@ class GoogleAuth(Auth, ABC):
                 "type": "service_account",
                 "project_id": "gtt-truck-stop",
                 "private_key_id": "87999a934c500ea064a81ebed73351adb46e3a66",
-                "private_key": os.getenv("FIREBASE_PRIVATE_KEY").replace('\\n', '\n'),
+                "private_key": os.environ.get("FIREBASE_PRIVATE_KEY").replace('\\n', '\n'),
                 "client_email": "firebase-adminsdk-fbsvc@gtt-truck-stop.iam.gserviceaccount.com",
                 "client_id": "110052854869427047912",
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
