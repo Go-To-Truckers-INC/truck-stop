@@ -1,57 +1,71 @@
 import os
 import json
 import firebase_admin
+import logging
 
 from firebase_admin import credentials
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from ..core.sdk import SDK
 
+logger = logging.getLogger(__name__)
 
 class FirebaseSDK(SDK):
     """
-    Implementación del SDK para Firebase usando variables de entorno
+    Implementación del SDK para Firebase con manejo robusto de errores
     """
 
     def __init__(self):
         self._app = None
         self._config = {}
         self._initialized = False
+        self._error = None
 
     def _load_from_env(self) -> Dict[str, Any]:
         """
         Carga la configuración de Firebase desde variables de entorno
-
-        Returns:
-            Dict con la configuración de Firebase
         """
-        # Opción 1: Service account JSON completo desde variable de entorno
-        service_account_json = os.getenv('FIREBASE_SERVICE_ACCOUNT_JSON')
-        if service_account_json:
-            try:
-                return {
-                    'service_account_json': json.loads(service_account_json)
-                }
-            except json.JSONDecodeError as e:
-                raise ValueError(f"Error parsing FIREBASE_SERVICE_ACCOUNT_JSON: {e}")
+        try:
+            # Opción 1: Service account JSON completo desde variable de entorno
+            service_account_json = os.getenv('FIREBASE_SERVICE_ACCOUNT_JSON')
+            if service_account_json:
+                try:
+                    return {
+                        'service_account_json': json.loads(service_account_json)
+                    }
+                except json.JSONDecodeError as e:
+                    self._error = f"Error parsing FIREBASE_SERVICE_ACCOUNT_JSON: {e}"
+                    logger.error(self._error)
+                    return {}
 
-        # Opción 2: Variables individuales
-        return {
-            'project_id': os.getenv('FIREBASE_PROJECT_ID'),
-            'private_key': os.getenv("FIREBASE_PRIVATE_KEY").replace('\\n', '\n'),
-            'client_email': os.getenv('FIREBASE_CLIENT_EMAIL'),
-            'private_key_id': os.getenv('FIREBASE_PRIVATE_KEY_ID'),
-            'client_id': os.getenv('FIREBASE_CLIENT_ID')
-        }
+            # Opción 2: Variables individuales
+            private_key = os.getenv("FIREBASE_PRIVATE_KEY")
+            if private_key:
+                private_key = private_key.replace('\\n', '\n')
+
+            config = {
+                'project_id': os.getenv('FIREBASE_PROJECT_ID'),
+                'private_key': private_key,
+                'client_email': os.getenv('FIREBASE_CLIENT_EMAIL'),
+                'private_key_id': os.getenv('FIREBASE_PRIVATE_KEY_ID'),
+                'client_id': os.getenv('FIREBASE_CLIENT_ID')
+            }
+
+            # Verificar configuración mínima requerida
+            if not config.get('project_id') or not config.get('private_key') or not config.get('client_email'):
+                self._error = "Configuración mínima de Firebase no encontrada en variables de entorno"
+                logger.warning(self._error)
+                return {}
+
+            return config
+
+        except Exception as e:
+            self._error = f"Error cargando configuración desde entorno: {e}"
+            logger.error(self._error)
+            return {}
 
     def initialize(self, config: Dict[str, Any] = None) -> bool:
         """
-        Inicializa Firebase Admin SDK desde variables de entorno o configuración proporcionada
-
-        Args:
-            config: Configuración opcional (si no se proporciona, usa variables de entorno)
-
-        Returns:
-            bool: True si la inicialización fue exitosa
+        Inicializa Firebase Admin SDK con manejo robusto de errores
         """
         try:
             if self._initialized:
@@ -60,6 +74,12 @@ class FirebaseSDK(SDK):
             # Cargar configuración desde variables de entorno si no se proporciona
             if config is None:
                 config = self._load_from_env()
+
+            # Si no hay configuración válida, no inicializar
+            if not config:
+                logger.warning("No se pudo cargar configuración para Firebase SDK")
+                self._initialized = False
+                return False
 
             self._config = config.copy()
 
@@ -77,11 +97,11 @@ class FirebaseSDK(SDK):
                 elif all(key in config for key in ['project_id', 'private_key', 'client_email']):
                     service_account_info = {
                         "type": "service_account",
-                        "project_id": "gtt-truck-stop",
-                        "private_key_id": "87999a934c500ea064a81ebed73351adb46e3a66",
-                        "private_key": os.getenv("FIREBASE_PRIVATE_KEY").replace('\\n', '\n'),
-                        "client_email": "firebase-adminsdk-fbsvc@gtt-truck-stop.iam.gserviceaccount.com",
-                        "client_id": "110052854869427047912",
+                        "project_id": config['project_id'],
+                        "private_key_id": config.get('private_key_id', ''),
+                        "private_key": config['private_key'],
+                        "client_email": config['client_email'],
+                        "client_id": config.get('client_id', ''),
                         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                         "token_uri": "https://oauth2.googleapis.com/token",
                         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
@@ -90,20 +110,26 @@ class FirebaseSDK(SDK):
                     }
                     cred = credentials.Certificate(service_account_info)
                 else:
-                    raise ValueError("Configuración de Firebase incompleta")
+                    self._error = "Configuración de Firebase incompleta"
+                    logger.error(self._error)
+                    self._initialized = False
+                    return False
 
                 # Inicializar la app
                 self._app = firebase_admin.initialize_app(cred)
                 self._initialized = True
+                logger.info("✅ Firebase SDK inicializado correctamente")
                 return True
             else:
                 # Ya hay una app inicializada
                 self._app = firebase_admin.get_app()
                 self._initialized = True
+                logger.info("✅ Firebase SDK ya estaba inicializado")
                 return True
 
         except Exception as e:
-            print(f"❌ Error inicializando Firebase SDK: {e}")
+            self._error = f"Error inicializando Firebase SDK: {e}"
+            logger.error(self._error)
             self._initialized = False
             return False
 
@@ -111,14 +137,23 @@ class FirebaseSDK(SDK):
         """Verifica si Firebase está inicializado"""
         return self._initialized and self._app is not None
 
+    def get_error(self) -> Optional[str]:
+        """Retorna el último error ocurrido"""
+        return self._error
+
     def get_client(self) -> Any:
         """
-        Retorna el cliente de Firebase Admin
-
-        Returns:
-            Firebase App instance
+        Retorna el cliente de Firebase Admin si está inicializado
         """
+        if not self.is_initialized():
+            raise RuntimeError("Firebase SDK no está inicializado")
         return self._app
+
+    def get_client_safe(self) -> Optional[Any]:
+        """
+        Retorna el cliente de Firebase Admin de forma segura (puede retornar None)
+        """
+        return self._app if self.is_initialized() else None
 
     def cleanup(self) -> bool:
         """Limpia recursos de Firebase"""
@@ -127,9 +162,12 @@ class FirebaseSDK(SDK):
                 firebase_admin.delete_app(self._app)
                 self._app = None
             self._initialized = False
+            self._error = None
+            logger.info("Firebase SDK limpiado correctamente")
             return True
         except Exception as e:
-            print(f"❌ Error limpiando Firebase SDK: {e}")
+            self._error = f"Error limpiando Firebase SDK: {e}"
+            logger.error(self._error)
             return False
 
     def get_config(self) -> Dict[str, Any]:

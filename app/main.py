@@ -16,25 +16,34 @@ from app.routes.dashboard import dashboard_bp
 from app.routes.companies import companies_bp
 from app.routes.developers import developers_bp
 
+
 def setup_sdks():
-    """Configura y inicializa todos los SDKs de forma explícita"""
+    """Configura y inicializa todos los SDKs con manejo graceful de errores"""
     sdk_manager = SDKManager()
 
     try:
         # Configuración explícita de Firebase SDK
         firebase_sdk = FirebaseSDK()
 
-        if firebase_sdk.is_initialized():
-            if sdk_manager.register_sdk('firebase', firebase_sdk):
-                print("✅ Firebase SDK inicializado correctamente")
-            else:
-                print("⚠️  Firebase SDK no se pudo registrar en SDKManager")
+        # Intentar inicializar Firebase
+        firebase_initialized = firebase_sdk.initialize()
+
+        if firebase_initialized:
+            print("✅ Firebase SDK inicializado correctamente")
         else:
-            print("⚠️  Firebase SDK no inicializado - continuando sin Firebase")
+            error_msg = firebase_sdk.get_error() or "Error desconocido"
+            print(f"⚠️  Firebase SDK no se pudo inicializar: {error_msg}")
+            print("⚠️  La aplicación continuará sin funcionalidades de Firebase")
+
+        # Registrar el SDK independientemente del resultado
+        registration_success = sdk_manager.register_sdk('firebase', firebase_sdk)
+
+        if not registration_success:
+            print("❌ Error registrando Firebase SDK en el manager")
 
     except Exception as e:
-        print(f"⚠️  Error configurando Firebase SDK: {e}")
-        print("ℹ️  Continuando sin Firebase...")
+        print(f"❌ Error inesperado configurando SDKs: {e}")
+        print("⚠️  La aplicación continuará sin SDKs adicionales")
 
     return sdk_manager
 
