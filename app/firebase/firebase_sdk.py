@@ -35,24 +35,13 @@ class FirebaseSDK(SDK):
                 raise ValueError(f"Error parsing FIREBASE_SERVICE_ACCOUNT_JSON: {e}")
 
         # Opción 2: Variables individuales
-        private_key = os.getenv('FIREBASE_PRIVATE_KEY')
-        if private_key:
-            return {
-                'project_id': os.getenv('FIREBASE_PROJECT_ID'),
-                'private_key': private_key.replace('\\n', '\n'),
-                'client_email': os.getenv('FIREBASE_CLIENT_EMAIL'),
-                'private_key_id': os.getenv('FIREBASE_PRIVATE_KEY_ID'),
-                'client_id': os.getenv('FIREBASE_CLIENT_ID')
-            }
-
-        # Opción 3: Archivo de credenciales
-        cred_path = os.getenv('FIREBASE_CREDENTIALS_PATH')
-        if cred_path and os.path.exists(cred_path):
-            return {
-                'credential_path': cred_path
-            }
-
-        raise ValueError("No se encontraron variables de entorno de Firebase configuradas")
+        return {
+            'project_id': os.getenv('FIREBASE_PROJECT_ID'),
+            'private_key': os.getenv("FIREBASE_PRIVATE_KEY").replace('\\n', '\n'),
+            'client_email': os.getenv('FIREBASE_CLIENT_EMAIL'),
+            'private_key_id': os.getenv('FIREBASE_PRIVATE_KEY_ID'),
+            'client_id': os.getenv('FIREBASE_CLIENT_ID')
+        }
 
     def initialize(self, config: Dict[str, Any] = None) -> bool:
         """
