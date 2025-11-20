@@ -58,13 +58,41 @@ def create_app():
 
     csp = {
         "default-src": ["'self'"],
-        "style-src": ["'self'", "https://cdn.jsdelivr.net", "'nonce-{{ g.nonce }}'"],
-        "script-src": ["'self'", "https://cdn.jsdelivr.net", "'nonce-{{ g.nonce }}'"]
+        "style-src": [
+            "'self'",
+            "https://cdn.jsdelivr.net",
+            "'unsafe-inline'"  # Necesario para Bootstrap y estilos inline
+        ],
+        "script-src": [
+            "'self'",
+            "https://cdn.jsdelivr.net",
+            "'unsafe-inline'"  # Necesario para scripts inline de Bootstrap
+        ],
+        "font-src": [
+            "'self'",
+            "https://cdn.jsdelivr.net",
+            "https://fonts.gstatic.com",
+            "data:"
+        ],
+        "img-src": [
+            "'self'",
+            "data:",
+            "https:",
+            "blob:"
+        ],
+        "connect-src": ["'self'"],
+        "frame-src": ["'none'"],
+        "object-src": ["'none'"],
+        "base-uri": ["'self'"]
     }
 
     # Inicializa Talisman
-    talisman = Talisman(server.app, content_security_policy=csp,
-                        content_security_policy_nonce_in=['style-src', 'script-src'])
+    Talisman(
+        server.app,
+        content_security_policy=csp,
+        content_security_policy_nonce_in=['script-src', 'style-src'],
+        force_https=False
+    )
 
     # 3. Configuración
     config = {
@@ -85,6 +113,7 @@ def create_app():
 
     # 6. Configurar CORS
     allowed_origins = os.getenv('ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
+
     server.setup_cors(
         origins=allowed_origins,
         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
