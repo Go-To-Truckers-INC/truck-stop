@@ -1,11 +1,11 @@
 import os
+
 from dotenv import load_dotenv
 
 # Cargar variables de entorno AL INICIO
 load_dotenv()
 
 from app.flask.flask_server import FlaskServer
-from app.firebase.firebase_sdk import FirebaseSDK
 from app.core.sdk_manager import SDKManager
 from flask_bootstrap import Bootstrap4
 
@@ -47,10 +47,6 @@ def setup_sdks():
         print("⚠️  La aplicación continuará sin SDKs adicionales")
 
     return sdk_manager
-
-import secrets
-from flask import g
-
 
 
 def create_app():

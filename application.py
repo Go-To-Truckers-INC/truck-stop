@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 from flask_talisman import Talisman
 
@@ -6,7 +7,6 @@ from flask_talisman import Talisman
 load_dotenv()
 
 from app.flask.flask_server import FlaskServer
-from app.firebase.firebase_sdk import FirebaseSDK
 from app.core.sdk_manager import SDKManager
 
 # Importar blueprints
